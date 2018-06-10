@@ -9,7 +9,7 @@ import (
 
 // LocService provide method for location
 type LocService interface {
-	GetLastLocation() (string, error) // (*models.Location) (*models.Location, error)
+	GetLastLocation(*gorm.DB, string) (*models.Location, error)
 	Create(*gorm.DB, *models.Location) (string, error)
 }
 
@@ -23,8 +23,10 @@ func NewLocService(locRepo repository.LocRepo) LocService {
 	return locUsecase
 }
 
-func (lu *locUsecase) GetLastLocation() (string, error) { // (loc *models.Location) (*models.Location, error) {
-	return "123.456789, 43.2198765", nil
+func (lu *locUsecase) GetLastLocation(innerCtx *gorm.DB, id string) (*models.Location, error) {
+	loc, err := lu.locRepo.GetLastLocation(innerCtx, id)
+
+	return loc, err
 }
 
 func (lu *locUsecase) Create(innerCtx *gorm.DB, loc *models.Location) (string, error) {

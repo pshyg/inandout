@@ -36,5 +36,5 @@ func newLocController(es *echo.Group, ls service.LocService, db *gorm.DB) {
 	}
 
 	es.POST("/loc/:userid", handler.Create)
-	es.GET("/loc", handler.GetLastLocation)
+	es.GET("/loc/:userid", handler.GetLastLocation)
 }

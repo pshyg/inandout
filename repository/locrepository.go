@@ -10,6 +10,7 @@ import (
 // LocRepo provide method that controll dataBase
 type LocRepo interface {
 	Create(*gorm.DB, *models.Location) (string, error)
+	GetLastLocation(*gorm.DB, string) (*models.Location, error)
 }
 
 // LocRepository has location table infomation
@@ -26,8 +27,11 @@ func NewLocrepository(db *gorm.DB) LocRepo {
 
 // Create create new record database Location table
 func (l LocRepository) Create(innerCtx *gorm.DB, loc *models.Location) (string, error) {
-	if !innerCtx.NewRecord(*loc) {
-		return "", fmt.Errorf("duplicated record")
+	var count int
+	innerCtx.Model(&models.Location{}).Where("time = ? AND user_id = ?", loc.Time, loc.UserID).Count(&count)
+
+	if count > 0 {
+		return "", fmt.Errorf("duplicated time at same userID")
 	}
 
 	if err := innerCtx.Create(loc).Error; err != nil {
@@ -35,4 +39,18 @@ func (l LocRepository) Create(innerCtx *gorm.DB, loc *models.Location) (string, 
 	}
 
 	return loc.UserID, nil
+}
+
+// GetLastLocation return opponant's last location
+func (l LocRepository) GetLastLocation(innerCtx *gorm.DB, id string) (*models.Location, error) {
+	loc := &models.Location{}
+	scope := innerCtx.Model(&models.Location{}).Limit(1).Where("user_id NOT LIKE ?", id).Order("time desc").Find(&loc)
+
+	if scope.Error != nil {
+		return nil, scope.Error
+	} else if scope.RowsAffected == 0 {
+		return nil, fmt.Errorf("record not found")
+	}
+
+	return loc, nil
 }
