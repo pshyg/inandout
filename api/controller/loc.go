@@ -9,17 +9,19 @@ import (
 
 // GetLastLocation return opponent last location
 func (h *HTTPLocHandler) GetLastLocation(c echo.Context) error {
-	//innerCtx := h.Db.New()
-	result, err := h.LocService.GetLastLocation()
+	innerCtx := h.Db.New()
+
+	id := c.Param("userid")
+	loc, err := h.LocService.GetLastLocation(innerCtx, id)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	return c.String(http.StatusOK, result)
+	return c.String(http.StatusOK, loc.String())
 }
 
-// Update update DB loc table using request json data
-func (h *HTTPLocHandler) Update(c echo.Context) error {
+// Create create record in DB loc table using request json data
+func (h *HTTPLocHandler) Create(c echo.Context) error {
 	innerCtx := h.Db.New()
 
 	loc := &models.Location{UserID: c.Param("userid")}
@@ -29,7 +31,7 @@ func (h *HTTPLocHandler) Update(c echo.Context) error {
 
 	result, err := h.LocService.Create(innerCtx, loc)
 	if err != nil {
-		return c.String(http.StatusBadRequest, "InnerSystem Error")
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
 	return c.String(http.StatusOK, result)
