@@ -32,7 +32,7 @@ func main() {
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 	}))
 
-	controller.InitController(e)
+	controller.InitController(e, db)
 	initServer(e)
 }
 
