@@ -9,10 +9,9 @@ import (
 
 // GetLastLocation return opponent last location
 func (h *HTTPLocHandler) GetLastLocation(c echo.Context) error {
-	innerCtx := h.Db.New()
-
 	id := c.Param("userid")
-	loc, err := h.LocService.GetLastLocation(innerCtx, id)
+
+	loc, err := h.LocService.GetLastLocation(h.DB, id)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
@@ -22,17 +21,27 @@ func (h *HTTPLocHandler) GetLastLocation(c echo.Context) error {
 
 // Create create record in DB loc table using request json data
 func (h *HTTPLocHandler) Create(c echo.Context) error {
-	innerCtx := h.Db.New()
-
 	loc := &models.Location{UserID: c.Param("userid")}
 	if err := c.Bind(loc); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	result, err := h.LocService.Create(innerCtx, loc)
+	result, err := h.LocService.Create(h.DB, loc)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
 	return c.String(http.StatusOK, result)
+}
+
+// GetAllOpponentLoc return all data of opponet
+func (h *HTTPLocHandler) GetAllOpponentLoc(c echo.Context) error {
+	id := c.Param("userid")
+
+	locs, err := h.LocService.GetAllOpponentLoc(h.DB, id)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	return c.String(http.StatusOK, locs[0].String())
 }
