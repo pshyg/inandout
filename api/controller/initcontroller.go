@@ -26,15 +26,16 @@ func InitController(e *echo.Echo, db *gorm.DB) {
 // HTTPLocHandler route location request to LocService
 type HTTPLocHandler struct {
 	LocService service.LocService
-	Db         *gorm.DB
+	DB         *gorm.DB
 }
 
 func newLocController(es *echo.Group, ls service.LocService, db *gorm.DB) {
 	handler := &HTTPLocHandler{
 		LocService: ls,
-		Db:         db,
+		DB:         db,
 	}
 
 	es.POST("/loc/:userid", handler.Create)
 	es.GET("/loc/:userid", handler.GetLastLocation)
+	es.GET("/locs/:userid", handler.GetAllOpponentLoc)
 }

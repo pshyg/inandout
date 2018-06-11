@@ -11,6 +11,7 @@ import (
 type LocService interface {
 	GetLastLocation(*gorm.DB, string) (*models.Location, error)
 	Create(*gorm.DB, *models.Location) (string, error)
+	GetAllOpponentLoc(*gorm.DB, string) (*models.Locations, error)
 }
 
 type locUsecase struct {
@@ -23,14 +24,26 @@ func NewLocService(locRepo repository.LocRepo) LocService {
 	return locUsecase
 }
 
-func (lu *locUsecase) GetLastLocation(innerCtx *gorm.DB, id string) (*models.Location, error) {
+// GetLastLocation return opponent's last location
+func (lu *locUsecase) GetLastLocation(db *gorm.DB, id string) (*models.Location, error) {
+	innerCtx := db.New()
 	loc, err := lu.locRepo.GetLastLocation(innerCtx, id)
 
 	return loc, err
 }
 
-func (lu *locUsecase) Create(innerCtx *gorm.DB, loc *models.Location) (string, error) {
+// Create create new location data record
+func (lu *locUsecase) Create(db *gorm.DB, loc *models.Location) (string, error) {
+	innerCtx := db.New()
 	result, err := lu.locRepo.Create(innerCtx, loc)
 
 	return result, err
+}
+
+// GetAllOpponentLoc return All data of opponent
+func (lu *locUsecase) GetAllOpponentLoc(db *gorm.DB, id string) (*models.Locations, error) {
+	innerCtx := db.New()
+	locs, err := lu.locRepo.GetAllOpponentLoc(innerCtx, id)
+
+	return locs, err
 }
