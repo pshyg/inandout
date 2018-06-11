@@ -11,7 +11,7 @@ import (
 type LocRepo interface {
 	Create(*gorm.DB, *models.Location) (string, error)
 	GetLastLocation(*gorm.DB, string) (*models.Location, error)
-	GetAllOpponentLoc(*gorm.DB, string) ([]*models.Location, error)
+	GetAllOpponentLoc(*gorm.DB, string) (*models.Locations, error)
 }
 
 // LocRepository has location table infomation
@@ -57,16 +57,18 @@ func (l LocRepository) GetLastLocation(innerCtx *gorm.DB, id string) (*models.Lo
 }
 
 // GetAllOpponentLoc return all data of oppoent
-func (l LocRepository) GetAllOpponentLoc(innerCtx *gorm.DB, id string) ([]*models.Location, error) {
-	var locs []*models.Location
+func (l LocRepository) GetAllOpponentLoc(innerCtx *gorm.DB, id string) (*models.Locations, error) {
+	var locSlice []*models.Location
 
-	scope := innerCtx.Model(&models.Location{}).Where("user_id NOT LIKE ?", id).Order("time desc").Find(&locs)
+	scope := innerCtx.Model(&models.Location{}).Where("user_id NOT LIKE ?", id).Order("time desc").Find(&locSlice)
 
 	if scope.Error != nil {
 		return nil, scope.Error
 	} else if scope.RowsAffected == 0 {
 		return nil, fmt.Errorf("record not found")
 	}
+
+	locs := &models.Locations{locSlice}
 
 	return locs, nil
 }

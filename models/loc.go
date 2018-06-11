@@ -2,6 +2,11 @@ package models
 
 import "fmt"
 
+// Locations has multi-value location data for GetAllOpponentLoc method
+type Locations struct {
+	Locs []*Location `json:"locs"`
+}
+
 // Location has user's latitude and longitude
 type Location struct {
 	UserID    string `json:"userid" gorm:"primary_key"`

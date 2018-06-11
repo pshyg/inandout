@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"inandout/models"
 	"net/http"
 
@@ -43,5 +44,10 @@ func (h *HTTPLocHandler) GetAllOpponentLoc(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	return c.String(http.StatusOK, locs[0].String())
+	returnData, err := json.Marshal(locs)
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, string(returnData))
 }
